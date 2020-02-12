@@ -1,0 +1,12 @@
+django==2.2.5
+djangorestframework
+django-rest-auth
+django-allauth
+djangorestframework-jwt
+django-rest-swagger==2.2.0
+markdown
+django-filter
+psycopg2-binary
+uwsgi
+fabric3
+termcolor
