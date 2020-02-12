@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from restapi.views import MonitorResultAPI
+from restapi.views import MonitorResultAPI, IndexView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/monitor/result', MonitorResultAPI.as_view()),
+    path('api/v1/monitor/result', MonitorResultAPI.as_view(), name="monitor-result"),
+    path('index', IndexView.as_view()),
 ]

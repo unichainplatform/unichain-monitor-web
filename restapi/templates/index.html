@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unichain</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container theme-showcase" role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <h1>Unichain monitor</h1>
+    </div>
+    <div class="container">
+        <h1>
+            <span class="label label-success">MAX Mined new block: {{ monitor_data.max_mined_number }}</span>
+        </h1>
+        <h1>
+            <span class="label label-success">MAX Imported new chain segment: {{ monitor_data.max_sync_number }}</span>
+        </h1>
+        {% for k, vs in monitor_data.data.items %}
+            <div class="page-header">
+                <h1>{{ k }}</h1>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Status</th>
+                            <th>Number</th>
+                            <th>Node</th>
+                            <th>errorlog</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for v in vs %}
+                            <tr>
+                                <td>1</td>
+                                {#                            status#}
+                                {% if v.status == 1 %}
+                                    <td><h5><span class="label label-success">Ok</span></h5></td>
+                                {% else %}
+                                    <td><h5><span class="label label-danger">Error</span></h5></td>
+                                {% endif %}
+                                {#                            numnber#}
+                                {% if v.status == 1 %}
+                                    <td>{{ v.number }}</td>
+                                {% else %}
+                                    <td> </td>
+                                {% endif %}
+                                {#                            type#}
+                                {% if v.status == 1 %}
+                                    <td>{{ v.type }}</td>
+                                {% else %}
+                                    <td>{{ v.type }}</td>
+                                {% endif %}
+                                {#                            reason#}
+                                {% if v.status == 1 %}
+                                    <td> </td>
+                                {% else %}
+                                    <td>{{ v.reason }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
