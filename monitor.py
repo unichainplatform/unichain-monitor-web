@@ -30,7 +30,9 @@ def _monitor():
                     "status": 1, "number": mined_number, "type": "node1"
                 })
             else:
-                pass
+                logs.append({
+                    "status": 0, "reason": mined_log, "type": "node1"
+                })
 
             if "Imported new chain segment" in sync_log_2:
                 sync_number_2 = re.findall('number=(\d*)', mined_log)[0]
@@ -39,7 +41,9 @@ def _monitor():
                     "status": 1, "number": mined_number, "type": "node2"
                 })
             else:
-                pass
+                logs.append({
+                    "status": 0, "reason": sync_log_2, "type": "node2"
+                })
 
             if "Imported new chain segment" in sync_log_3:
                 sync_number_3 = re.findall('number=(\d*)', mined_log)[0]
@@ -48,8 +52,9 @@ def _monitor():
                     "status": 1, "number": mined_number, "type": "node3"
                 })
             else:
-                pass
-    print(env.host_string)
+                logs.append({
+                    "status": 0, "reason": sync_log_3, "type": "node3"
+                })
     item[env.host_string] = logs
 
 
