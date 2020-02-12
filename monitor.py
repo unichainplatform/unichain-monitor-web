@@ -1,35 +1,72 @@
-from fabric.api import task, env, run, put, settings, cd, hide, execute
+from fabric.api import task, env, run, put, settings, cd, hide, execute, parallel
 from utils import host_parser
-from termcolor import colored
+import re
 
 hosts, passwords = host_parser()
 
 env.hosts.extend(hosts)
 env.passwords = passwords
 
+mined_list = []
+sync_list = []
+item = {}
+
 
 def _monitor():
-    r = list()
-
-    with cd('~/fractal/build/bin'):
+    with cd('~/uni/build/bin'):
+        logs = []
         with settings(
             hide('warnings', 'running', 'stdout', 'stderr'),
             warn_only=True
     ):
-            r.append((8545, run('tail -1 8545.log')))
-            r.append((8547, run('tail -1 8547.log')))
-            r.append((8549, run('tail -1 8549.log')))
-            r.append((8551, run('tail -1 8551.log')))
-    for v in r:
-        level = v[1].split(' ', 1)[0]
-        text = v[1].split(' ', 1)[1]
-        print(
-            colored('[' + env.host_string + ']', 'blue'),
-            colored('[http_port@' + str(v[0]) + ']', 'green'),
-            colored(level, 'red'), text
-        )
-    return r
+            mined_log =run('tail -1 node1.log')
+            sync_log_2 = run('tail -1 node2.log')
+            sync_log_3 = run('tail -1 node3.log')
+
+            if "Mined new block" in mined_log:
+                mined_number = re.findall('number=(\d*)', mined_log)[0]
+                mined_list.append(mined_number)
+                logs.append({
+                    "status": 1, "number": mined_number, "type": "node1"
+                })
+            else:
+                pass
+
+            if "Imported new chain segment" in sync_log_2:
+                sync_number_2 = re.findall('number=(\d*)', mined_log)[0]
+                sync_list.append(sync_number_2)
+                logs.append({
+                    "status": 1, "number": mined_number, "type": "node2"
+                })
+            else:
+                pass
+
+            if "Imported new chain segment" in sync_log_3:
+                sync_number_3 = re.findall('number=(\d*)', mined_log)[0]
+                sync_list.append(sync_number_3)
+                logs.append({
+                    "status": 1, "number": mined_number, "type": "node3"
+                })
+            else:
+                pass
+    print(env.host_string)
+    item[env.host_string] = logs
 
 
 def monitor_result():
-    return execute(_monitor)
+    global mined_list
+    global sync_list
+    global item
+    execute(_monitor)
+    tmp_sync = sync_list
+    tmp_mined = mined_list
+    tmp_item = item
+
+    sync_list = []
+    mined_list = []
+    item = {}
+    return {
+        "max_sync_number": max(tmp_sync),
+        "max_mined_number": max(tmp_mined),
+        "data": tmp_item
+    }

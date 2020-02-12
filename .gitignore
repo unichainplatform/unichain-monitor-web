@@ -3,3 +3,4 @@ venv
 *.pyc
 run.log
 /media
+db.sqlite3
