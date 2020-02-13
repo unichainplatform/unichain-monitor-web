@@ -25,7 +25,7 @@ SECRET_KEY = 'nbwebw292!19(_2y6pa@-d@anpd41d+qrauei2=5lc%%&ne%5k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
