@@ -10,3 +10,13 @@ psycopg2-binary
 uwsgi
 fabric3
 termcolor
+
+future==0.16.0
+twisted
+hexbytes
+xlwt
+rlp==1.0.1
+web3
+base58
+mnemonic
+termcolor
