@@ -25,22 +25,54 @@ def install_go():
 def initial():
     run('apt update')
     run('apt install -y git jq moreutils screen')
-
-    with settings(warn_only=True):
-        result = run('go version')
-    if result.return_code != 0:
-        install_go()
     return
 
 
-def unichain():
-    run("git clone https://github.com/unichainplatform/unichain.git ~/uni")
-    with cd('~/uni'):
+def check_go():
+    with settings(warn_only=True):
+        result = run('go version')
+    if result.return_code != 0:
+        return False
+    return True
+
+
+def check_unichain_installed():
+    with settings(warn_only=True):
+        result = run('~/unichain/build/bin/uni version')
+    if result.return_code != 0:
+        return False
+    return True
+
+
+def check_unichain_running():
+    with settings(warn_only=True):
+        with cd('~/unichain/build/bin'):
+            mined_log = run('tail -1 node1.log')
+            sync_log_2 = run('tail -1 node2.log')
+            sync_log_3 = run('tail -1 node3.log')
+
+    if mined_log.return_code != 0 or sync_log_2.return_code != 0 or sync_log_3.return_code != 0:
+        return False
+    if "Mined new block" not in mined_log:
+        return False
+    if "Imported new chain segment" not in sync_log_2:
+        return False
+    if "Imported new chain segment" not in sync_log_3:
+        return False
+    return True
+
+def install_unichain():
+    run("git clone https://github.com/unichainplatform/unichain.git ~/unichain")
+    with cd('~/unichain'):
         run("make fmt")
         run("make all")
         run("""jq '.allocAccounts[0].pubKey="{}"' build/genesis.json | sponge build/genesis.json""".format(public_key))
         run("""jq '.config.bootnodes=["fnode://a85ccab0374c60ddea0a63b521ae3f8475100ff4e116090d6798a8618ceea193f5b7deffc14627b2f61bc374336983f6a6c6ed979478590d49906e8ce6041a18@127.0.0.1:2018"]' build/genesis.json | sponge build/genesis.json""")
-    with cd('~/uni/build/bin'):
+
+
+def make_unichain_run():
+    run('pkill uni')
+    with cd('~/unichain/build/bin'):
         run("touch privateKey.txt")
         run("""echo {} > privateKey.txt""".format(private_key))
         # node 8545
@@ -55,4 +87,11 @@ def unichain():
 @parallel(pool_size=100)
 def build():
     initial()
-    unichain()
+    if not check_go():
+        install_go()
+
+    if not check_unichain_installed():
+        install_unichain()
+
+    if not check_unichain_running():
+        make_unichain_run()

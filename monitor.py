@@ -13,7 +13,7 @@ item = {}
 
 
 def _monitor():
-    with cd('~/uni/build/bin'):
+    with cd('~/unichain/build/bin'):
         logs = []
         with settings(
             hide('warnings', 'running', 'stdout', 'stderr'),
