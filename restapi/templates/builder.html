@@ -5,6 +5,7 @@
     <title>Unichain</title>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 </head>
 <body>
 <div class="container theme-showcase" role="main">
@@ -16,9 +17,10 @@
 
     <p>
         <button type="button" class="btn btn-lg btn-primary">开始部署</button>
+        <div class="tips"></div>
     </p>
     <div class="container">
-    <h2>Unichain各节点状态</h2>
+        <h2>Unichain各节点状态</h2>
         <div class="row">
             <div class="col-md-6">
                 <table class="table">
@@ -51,5 +53,20 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        function start_build() {
+            $.get("{% url 'build-status' %}",
+                function (data) {
+                $("div.tips").append('<p>' + data + '</p>');
+            })
+        }
+
+        $("button").click(function () {
+            $("div.tips").append('<p>121123</p>');
+            {#start_build();#}
+        });
+    });
+</script>
 </body>
 </html>

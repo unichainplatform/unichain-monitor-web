@@ -5,7 +5,9 @@ from rest_framework.response import Response
 import traceback as tb
 from monitor import monitor_result
 from django.views.generic import TemplateView
-from restapi.models import Hosts
+from restapi.models import Hosts, Accounts
+from web.celery import app
+from restapi.tasks import build
 
 
 class StartBuild(APIView):
@@ -13,7 +15,18 @@ class StartBuild(APIView):
     http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
-        return Response('Ok', status=status.HTTP_200_OK)
+        account = Accounts.objects.first()
+        i = app.control.inspect()
+
+        if not account or not account.public_key or not account.private_key:
+            return Response('请先于控制中心设置出块帐号', status=status.HTTP_200_OK)
+        if not Hosts.objects.all():
+            return Response('请先于控制中心设置机器信息', status=status.HTTP_200_OK)
+        if i.active()[list(i.active().keys())[0]]:
+            return Response('请勿重复点击', status=status.HTTP_200_OK)
+        else:
+            build.delay()
+            return Response('部署中..............', status=status.HTTP_200_OK)
 
 
 class IndexView(TemplateView):
