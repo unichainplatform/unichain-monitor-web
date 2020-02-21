@@ -70,7 +70,7 @@ def install_unichain():
 
 
 def make_unichain_run():
-    run("ps -A | grep uni | awk '{print $1}' | xargs -n1")
+    run("ps -A | grep uni | awk '{print $1}' | xargs kill -9 $1")
     with cd('~/unichain/build/bin'):
         run("""jq '.allocAccounts[0].pubKey="{}"' ../genesis.json | sponge ../genesis.json""".format(public_key))
         run("""jq '.config.bootnodes=["fnode://a85ccab0374c60ddea0a63b521ae3f8475100ff4e116090d6798a8618ceea193f5b7deffc14627b2f61bc374336983f6a6c6ed979478590d49906e8ce6041a18@127.0.0.1:2018"]' ../genesis.json | sponge ../genesis.json""")
