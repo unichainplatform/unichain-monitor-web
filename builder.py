@@ -1,6 +1,7 @@
 from fabric.api import task, env, run, put, settings, cd, hide, execute, parallel
 from utils import host_parser, account_reader
-
+from restapi.models import Hosts
+import time
 
 hosts, passwords = host_parser()
 public_key, private_key = account_reader()
@@ -9,7 +10,7 @@ env.hosts.extend(hosts)
 env.passwords = passwords
 
 
-def install_go():
+def install_go(ip):
     run('wget https://dl.google.com/go/go1.13.7.linux-amd64.tar.gz')
     with settings(
             hide('warnings', 'running', 'stdout', 'stderr'),
@@ -20,11 +21,13 @@ def install_go():
     run("echo 'export PATH=$PATH:$GOROOT/bin' >> /etc/profile")
     run("source /etc/profile")
     run("go version")
+    Hosts.objects.filter(ip=ip).update(status=2)
 
 
-def initial():
+def initial(ip):
     run('apt update')
     run('apt install -y git jq moreutils screen')
+    Hosts.objects.filter(ip=ip).update(status=1)
     return
 
 
@@ -62,14 +65,15 @@ def check_unichain_running():
     return True
 
 
-def install_unichain():
+def install_unichain(ip):
     run("git clone https://github.com/unichainplatform/unichain.git ~/unichain")
     with cd('~/unichain'):
         run("make fmt")
         run("make all")
+    Hosts.objects.filter(ip=ip).update(status=3)
 
 
-def make_unichain_run():
+def make_unichain_run(ip):
     run("ps -A | grep uni | awk '{print $1}' | xargs kill -9 $1")
     with cd('~/unichain/build/bin'):
         run("""jq '.allocAccounts[0].pubKey="{}"' ../genesis.json | sponge ../genesis.json""".format(public_key))
@@ -83,17 +87,28 @@ def make_unichain_run():
         run("nohup ./uni --genesis=../genesis.json --datadir=./data/node3 --p2p_listenaddr :2020  --http_host 0.0.0.0 --http_port 8090 --ws_port 8091 --contractlog --http_modules=fee,miner,dpos,account,txpool,uni &> node3.log & sleep 5; exit 0", warn_only=True)
         run('./uni miner -i ./data/node1/uni.ipc setcoinbase "unichain.founder" privateKey.txt')
         run('rm privateKey.txt')
+    Hosts.objects.filter(ip=ip).update(status=4)
 
 
 @task
 @parallel(pool_size=100)
 def build():
-    initial()
-    if not check_go():
-        install_go()
-
-    if not check_unichain_installed():
-        install_unichain()
-
-    if not check_unichain_running():
-        make_unichain_run()
+    ip = env.host_string.split("@")[1].replace(':22', '')
+    try:
+        # dependent install
+        initial(ip)
+        # golang install
+        if not check_go():
+            install_go(ip)
+        # unichain install
+        if not check_unichain_installed():
+            install_unichain(ip)
+        # running
+        if not check_unichain_running():
+            make_unichain_run(ip)
+        # check again
+        time.sleep(5)
+        if not check_unichain_running():
+            raise ValueError
+    except:
+        Hosts.objects.filter(ip=ip).update(status=-1)

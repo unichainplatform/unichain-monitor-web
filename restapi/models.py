@@ -13,7 +13,15 @@ class Accounts(models.Model):
 
 
 class Hosts(models.Model):
+    status_choice = (
+        (0, 'initial'),
+        (1, 'dependent'),
+        (2, 'golang'),
+        (3, 'unichain'),
+        (4, 'running'),
+        (-1, 'fail'),
+    )
     ip = models.CharField(max_length=200, blank=True, null=True, unique=True)
     user = models.CharField(max_length=200, blank=True, null=True)
     password = models.CharField(max_length=200, blank=True, null=True)
-    status = models.CharField(max_length=200, blank=True, null=True)
+    status = models.IntegerField(blank=True, null=True, choices=status_choice, default=0)
