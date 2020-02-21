@@ -17,8 +17,8 @@
 
     <p>
         <button type="button" class="btn btn-lg btn-primary">开始部署</button>
-        <div class="tips"></div>
     </p>
+    <div class="tips"></div>
     <div class="container">
         <h2>Unichain各节点状态</h2>
         <div class="row">
@@ -32,21 +32,8 @@
                         <th>Status</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    {% for v in build_data %}
-                        <tr>
-                            <td>1</td>
-                            <td>{{ v.ip }}></td>
-                            <td>{{ v.step }}</td>
-                            {% if v.status == -1 %}
-                                <td><span class="label label-danger">Fail</span></td>
-                            {% elif v.status == 5 %}
-                                <td><span class="label label-success">Success</span></td>
-                            {% else %}
-                                <td><span class="label label-info">Pending</span></td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
+                    <tbody class="table_body">
+                    {% include 'table_body.html' %}
                     </tbody>
                 </table>
             </div>
@@ -56,15 +43,28 @@
 <script>
     $(document).ready(function () {
         function start_build() {
-            $.get("{% url 'build-status' %}",
+            $.get("{% url 'build_status' %}",
                 function (data) {
-                $("div.tips").append('<p>' + data + '</p>');
-            })
+                    $("div.tips").text("");
+                    $("div.tips").append('<p>' + data["text"] + '</p>');
+                    return (data["code"])
+                })
         }
 
+        function update_item() {
+            $('.table_body').html('').load(
+                "{% url 'update_items' %}"
+            )
+        }
+
+
         $("button").click(function () {
-            $("div.tips").append('<p>121123</p>');
-            {#start_build();#}
+            code = start_build();
+            if (code == 1) {
+                setInterval(function () {
+                    update_item();
+                }, 3000);
+            }
         });
     });
 </script>

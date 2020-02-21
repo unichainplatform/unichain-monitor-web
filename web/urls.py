@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from restapi.views import IndexView, BuilderView, StartBuild
+from restapi.views import IndexView, BuilderView, StartBuild, update_items
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/uni/build', StartBuild.as_view(), name="build-status"),
+    path('api/uni/build', StartBuild.as_view(), name="build_status"),
+    path('api/uni/update', update_items, name="update_items"),
     path('uni/builder', BuilderView.as_view(), name="builder"),
     path('uni/monitor', IndexView.as_view(), name="monitor"),
 ]

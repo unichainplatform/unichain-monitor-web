@@ -8,6 +8,20 @@ from django.views.generic import TemplateView
 from restapi.models import Hosts, Accounts
 from web.celery import app
 from restapi.tasks import build
+from django.shortcuts import render
+
+
+def update_items(request):
+    vs = []
+    qs = Hosts.objects.all()
+
+    for q in qs:
+        vs.append({
+            "step": q.get_status_display(),
+            "status": q.status,
+            "ip": q.ip
+        })
+    return render(request, 'table_body.html', {'build_data':vs})
 
 
 class StartBuild(APIView):
@@ -19,14 +33,14 @@ class StartBuild(APIView):
         i = app.control.inspect()
 
         if not account or not account.public_key or not account.private_key:
-            return Response('请先于控制中心设置出块帐号', status=status.HTTP_200_OK)
+            return Response({'code': -1, 'text': '请先于控制中心设置出块帐号'}, status=status.HTTP_200_OK)
         if not Hosts.objects.all():
-            return Response('请先于控制中心设置机器信息', status=status.HTTP_200_OK)
+            return Response({'code': -1, 'text': '请先于控制中心设置机器信息'}, status=status.HTTP_200_OK)
         if i.active()[list(i.active().keys())[0]]:
-            return Response('请勿重复点击', status=status.HTTP_200_OK)
+            return Response({'code': -1, 'text': '请勿重复点击'}, status=status.HTTP_200_OK)
         else:
             build.delay()
-            return Response('部署中..............', status=status.HTTP_200_OK)
+            return Response({'code': 1, 'text': '部署中..............'}, status=status.HTTP_200_OK)
 
 
 class IndexView(TemplateView):
@@ -41,17 +55,17 @@ class IndexView(TemplateView):
 class BuilderView(TemplateView):
     template_name = 'builder.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(BuilderView, self).get_context_data(**kwargs)
-
-        vs = []
-        qs = Hosts.objects.all()
-
-        for q in qs:
-            vs.append({
-                "step": q.get_status_display(),
-                "status": q.status,
-                "ip": q.ip
-            })
-        context['build_data'] = vs
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(BuilderView, self).get_context_data(**kwargs)
+    #
+    #     vs = []
+    #     qs = Hosts.objects.all()
+    #
+    #     for q in qs:
+    #         vs.append({
+    #             "step": q.get_status_display(),
+    #             "status": q.status,
+    #             "ip": q.ip
+    #         })
+    #     context['build_data'] = vs
+    #     return context
