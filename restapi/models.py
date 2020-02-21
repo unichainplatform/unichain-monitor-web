@@ -14,14 +14,33 @@ class Accounts(models.Model):
 
 class Hosts(models.Model):
     status_choice = (
-        (0, 'initial'),
-        (1, 'dependent'),
-        (2, 'golang'),
-        (3, 'unichain'),
-        (4, 'running'),
+        (0, 'has no start'),
+        (1, 'initial'),
+        (2, 'install dependent'),
+        (3, 'install golang'),
+        (4, 'build unichain'),
+        (5, 'done'),
         (-1, 'fail'),
     )
     ip = models.CharField(max_length=200, blank=True, null=True, unique=True)
     user = models.CharField(max_length=200, blank=True, null=True)
     password = models.CharField(max_length=200, blank=True, null=True)
     status = models.IntegerField(blank=True, null=True, choices=status_choice, default=0)
+
+
+def host_parser():
+    """
+    :return:
+        hosts: 服务器列表
+        passwords: 密码列表
+    """
+    objs = Hosts.objects.all()
+
+    _hosts = [''.join([obj.user, '@', obj.ip, ':22']) for obj in objs]
+    passwords = {''.join([obj.user, '@', obj.ip, ':22']) : obj.password for obj in objs}
+    return _hosts, passwords
+
+
+def account_reader():
+    obj = Accounts.objects.first()
+    return obj.public_key, obj.private_key

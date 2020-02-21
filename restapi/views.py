@@ -5,18 +5,15 @@ from rest_framework.response import Response
 import traceback as tb
 from monitor import monitor_result
 from django.views.generic import TemplateView
+from restapi.models import Hosts
 
 
-class MonitorResultAPI(APIView):
-    """
-    监控结果
-    ---
-    """
+class StartBuild(APIView):
     permission_classes = (AllowAny,)
     http_method_names = ['get']
 
     def get(self, request, *args, **kwargs):
-        return Response(monitor_result(), status=status.HTTP_200_OK)
+        return Response('Ok', status=status.HTTP_200_OK)
 
 
 class IndexView(TemplateView):
@@ -25,5 +22,23 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['monitor_data'] = monitor_result()
-        context['fake'] = {"a": 1, "b": 2, "c": 3}
+        return context
+
+
+class BuilderView(TemplateView):
+    template_name = 'builder.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(BuilderView, self).get_context_data(**kwargs)
+
+        vs = []
+        qs = Hosts.objects.all()
+
+        for q in qs:
+            vs.append({
+                "step": q.get_status_display(),
+                "status": q.status,
+                "ip": q.ip
+            })
+        context['build_data'] = vs
         return context

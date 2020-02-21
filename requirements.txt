@@ -10,7 +10,8 @@ psycopg2-binary
 uwsgi
 fabric3
 termcolor
-
+celery
+redis
 future==0.16.0
 twisted
 hexbytes
