@@ -1,4 +1,4 @@
-from restapi.models import HostsModel, AccountModel
+from restapi.models import Hosts, Accounts
 
 
 def host_parser():
@@ -7,7 +7,7 @@ def host_parser():
         hosts: 服务器列表
         passwords: 密码列表
     """
-    objs = HostsModel.objects.all()
+    objs = Hosts.objects.all()
 
     _hosts = [''.join([obj.user, '@', obj.ip, ':22']) for obj in objs]
     passwords = {''.join([obj.user, '@', obj.ip, ':22']) : obj.password for obj in objs}
@@ -15,5 +15,5 @@ def host_parser():
 
 
 def account_reader():
-    obj = AccountModel.objects.first()
+    obj = Accounts.objects.first()
     return obj.public_key, obj.private_key
