@@ -57,14 +57,11 @@
             )
         }
 
-
+        setInterval(function () {
+            update_item();
+        }, 3000);
         $("button").click(function () {
-            code = start_build();
-            if (code == 1) {
-                setInterval(function () {
-                    update_item();
-                }, 3000);
-            }
+            start_build();
         });
     });
 </script>
