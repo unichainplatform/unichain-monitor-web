@@ -90,7 +90,6 @@ def make_unichain_run(ip):
 
 
 @task
-@parallel(pool_size=100)
 def start():
     ip = env.host_string.split("@")[1].replace(':22', '')
     try:
