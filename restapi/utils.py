@@ -16,4 +16,7 @@ def host_parser():
 
 def account_reader():
     obj = Accounts.objects.first()
-    return obj.public_key, obj.private_key
+    if obj:
+        return obj.public_key, obj.private_key
+    else:
+        return None, None
