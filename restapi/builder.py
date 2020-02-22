@@ -20,13 +20,13 @@ def install_go(ip):
     run("echo 'export PATH=$PATH:$GOROOT/bin' >> /etc/profile")
     run("source /etc/profile")
     run("go version")
-    Hosts.objects.filter(ip=ip).update(status=2)
+    Hosts.objects.filter(ip=ip).update(status=3)
 
 
 def initial(ip):
     run('apt update')
     run('apt install -y git jq moreutils screen')
-    Hosts.objects.filter(ip=ip).update(status=1)
+    Hosts.objects.filter(ip=ip).update(status=2)
     return
 
 
@@ -69,7 +69,7 @@ def install_unichain(ip):
     with cd('~/unichain'):
         run("make fmt")
         run("make all")
-    Hosts.objects.filter(ip=ip).update(status=3)
+    Hosts.objects.filter(ip=ip).update(status=4)
 
 
 def make_unichain_run(ip):
@@ -86,7 +86,7 @@ def make_unichain_run(ip):
         run("nohup ./uni --genesis=../genesis.json --datadir=./data/node3 --p2p_listenaddr :2020  --http_host 0.0.0.0 --http_port 8090 --ws_port 8091 --contractlog --http_modules=fee,miner,dpos,account,txpool,uni &> node3.log & sleep 5; exit 0", warn_only=True)
         run('./uni miner -i ./data/node1/uni.ipc setcoinbase "unichain.founder" privateKey.txt')
         run('rm privateKey.txt')
-    Hosts.objects.filter(ip=ip).update(status=4)
+    Hosts.objects.filter(ip=ip).update(status=5)
 
 
 @task
