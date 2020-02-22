@@ -108,5 +108,7 @@ def start():
         time.sleep(5)
         if not check_unichain_running():
             raise ValueError
+        else:
+            Hosts.objects.filter(ip=ip).update(status=5)
     except:
         Hosts.objects.filter(ip=ip).update(status=-1)
