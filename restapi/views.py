@@ -2,8 +2,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-import traceback as tb
-from monitor import monitor_result
+from restapi.monitor import monitor_result
 from django.views.generic import TemplateView
 from restapi.models import Hosts, Accounts
 from web.celery import app

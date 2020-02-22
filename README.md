@@ -1,6 +1,34 @@
-fractal监控程序后端
+unichain 管理后台
 ===
-
+virtualenv
+---
+```
+// install pip3
+apt install python3-pip
+// instal virtualenv
+pip3 install virtualenv
+//create virtualenv
+virtualenv -p python3 venv
+//use virtualenv
+source venv/bin/active
+```
+dependent
+---
+```shell script
+cd <project>
+pip3 install -r requirements.txt
+apt install redis-server
+[test redis]
+>>> redis-cli ping
+>>> PONG
+apt install nginx
+```
+celery
+---
+```
+```
+nginx & uwsgi
+---
 ```shell script
 # [OPTIONAL!]
 # [test if uwsgi works]
