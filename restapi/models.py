@@ -26,21 +26,3 @@ class Hosts(models.Model):
     user = models.CharField(max_length=200, blank=True, null=True)
     password = models.CharField(max_length=200, blank=True, null=True)
     status = models.IntegerField(blank=True, null=True, choices=status_choice, default=0)
-
-
-def host_parser():
-    """
-    :return:
-        hosts: 服务器列表
-        passwords: 密码列表
-    """
-    objs = Hosts.objects.all()
-
-    _hosts = [''.join([obj.user, '@', obj.ip, ':22']) for obj in objs]
-    passwords = {''.join([obj.user, '@', obj.ip, ':22']) : obj.password for obj in objs}
-    return _hosts, passwords
-
-
-def account_reader():
-    obj = Accounts.objects.first()
-    return obj.public_key, obj.private_key

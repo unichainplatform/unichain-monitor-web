@@ -1,5 +1,5 @@
 from fabric.api import task, env, run, put, settings, cd, hide, execute, parallel
-from restapi.models import Hosts, host_parser, account_reader
+from restapi.utils import Hosts, host_parser, account_reader
 import time
 
 hosts, passwords = host_parser()
